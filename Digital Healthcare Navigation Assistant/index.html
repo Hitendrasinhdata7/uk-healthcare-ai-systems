@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Navigation Assistant</title>
+    <style>
+        /* Simple Styles */
+        body { font-family: Arial, sans-serif; background: #f0f4f5; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        header { background: #005EB8; color: white; padding: 30px; text-align: center; border-radius: 10px; }
+        .disclaimer { background: #ffebee; border: 3px solid red; padding: 20px; margin: 20px 0; text-align: center; font-weight: bold; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        label { display: block; margin: 15px 0 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #007f3b; color: white; padding: 15px; width: 100%; border: none; border-radius: 5px; font-size: 1.2em; cursor: pointer; }
+        /* Modal - Hidden by default */
+        #result-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 600px; text-align: center; position: relative; }
+        .close-button { position: absolute; top: 10px; right: 20px; font-size: 30px; cursor: pointer; }
+        .pathway-card { background: #e8f4ff; padding: 20px; margin: 20px 0; border-radius: 8px; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Healthcare Navigation Assistant</h1>
+        </header>
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> This tool provides general guidance based on public NHS information and does not replace professional medical advice. Call 999 in emergencies.
+        </div>
+        <div class="card">
+            <form id="navigation-form">
+                <label>Age Group:</label>
+                <select id="age" required>
+                    <option value="">Select</option>
+                    <option value="under1">Under 1 year</option>
+                    <option value="1-4">1-4 years</option>
+                    <option value="5-11">5-11 years</option>
+                    <option value="12-17">12-17 years</option>
+                    <option value="18-64">18-64 years</option>
+                    <option value="65+">65+ years</option>
+                </select>
+
+                <label>Postcode:</label>
+                <input type="text" id="postcode" placeholder="e.g. SW1A 1AA" required>
+
+                <label>Symptoms (select one or more):</label>
+                <select id="symptoms" multiple required size="8">
+                    <option value="severe_chest_pain">Severe chest pain</option>
+                    <option value="stroke_signs">Stroke signs</option>
+                    <option value="severe_bleeding">Severe bleeding</option>
+                    <option value="difficulty_breathing">Difficulty breathing</option>
+                    <option value="sore_throat">Sore throat</option>
+                    <option value="earache">Earache</option>
+                    <option value="uti">Uncomplicated UTI (women)</option>
+                    <option value="sinusitis">Sinusitis</option>
+                    <option value="shingles">Shingles</option>
+                    <option value="impetigo">Impetigo</option>
+                    <option value="infected_insect_bite">Infected insect bite</option>
+                    <option value="mild_headache">Mild headache</option>
+                    <option value="minor_cut_sprain">Minor cut or sprain</option>
+                    <option value="mild_cough">Mild cough/cold</option>
+                </select>
+
+                <button type="submit">Get Guidance</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Popup -->
+    <div id="result-modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="document.getElementById('result-modal').style.display='none'">&times;</span>
+            <h2>Your Recommended Pathway</h2>
+            <div id="pathway-output" class="pathway-card"></div>
+            <div id="locations-output"></div>
+        </div>
+    </div>
+
+    <script>
+        // Inline Logic & Script - No external files needed for this test
+        function getPathway(age, symptoms) {
+            if (symptoms.includes('severe_chest_pain') || symptoms.includes('stroke_signs') || symptoms.includes('severe_bleeding') || symptoms.includes('difficulty_breathing')) {
+                return {message: '🚨 EMERGENCY: Call 999 immediately!', service: null};
+            }
+            if (symptoms.includes('sore_throat') || symptoms.includes('earache') || symptoms.includes('uti') || symptoms.includes('sinusitis') || symptoms.includes('shingles') || symptoms.includes('impetigo') || symptoms.includes('infected_insect_bite')) {
+                return {message: 'Community Pharmacy (Pharmacy First eligible)', service: 'pharmacy'};
+            }
+            if (symptoms.includes('minor_cut_sprain')) {
+                return {message: 'Urgent Treatment Centre recommended', service: 'urgent'};
+            }
+            return {message: 'Self-care or GP / NHS 111', service: 'pharmacy'};
+        }
+
+        function getMockLocations(type, postcode) {
+            const pc = postcode || 'SW1A 1AA';
+            return [
+                {name: 'Example Pharmacy 1', address: '123 High Street', postcode: pc, phone: '020 1234 5678'},
+                {name: 'Example Pharmacy 2', address: '456 Main Road', postcode: pc, phone: '020 8765 4321'}
+            ];
+        }
+
+        document.getElementById('navigation-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const age = document.getElementById('age').value;
+            const postcode = document.getElementById('postcode').value.toUpperCase().replace(/\s/g, '');
+            const symptoms = Array.from(document.getElementById('symptoms').selectedOptions).map(o => o.value);
+
+            if (!age || symptoms.length === 0) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            const pathway = getPathway(age, symptoms);
+            document.getElementById('pathway-output').innerHTML = '<strong>' + pathway.message + '</strong>';
+
+            let locHTML = '<h3>Nearby Services (Demo)</h3><ul>';
+            getMockLocations(pathway.service, postcode).forEach(l => {
+                locHTML += `<li><strong>${l.name}</strong><br>${l.address}<br>${l.postcode}<br>${l.phone}</li><hr>`;
+            });
+            locHTML += '</ul>';
+            document.getElementById('locations-output').innerHTML = locHTML;
+
+            document.getElementById('result-modal').style.display = 'flex'; // Show popup
+        });
+    </script>
+</body>
+</html>

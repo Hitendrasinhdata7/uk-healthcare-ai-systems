@@ -1,0 +1,40 @@
+/* Modal - Fixed: Hidden by default, no flash on load */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    display: none; /* Critical fix: hidden by default */
+}
+
+.modal.active { /* Only shown when JS adds 'active' class */
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 750px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 36px;
+    cursor: pointer;
+    color: #aaa;
+    font-weight: bold;
+}
+
+.close-button:hover {
+    color: #da291c;
+}

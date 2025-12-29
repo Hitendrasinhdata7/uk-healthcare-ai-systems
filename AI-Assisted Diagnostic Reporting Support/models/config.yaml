@@ -1,0 +1,10 @@
+model:
+  vit: google/vit-base-patch16-224-in21k
+  llm: microsoft/biogpt
+
+datasets:
+  public_samples: /data/samples/
+
+parameters:
+  heatmap_threshold: 0.5
+  report_max_tokens: 200
