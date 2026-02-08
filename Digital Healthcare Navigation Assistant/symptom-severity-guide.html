@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Symptom Severity Self-Assessment - UK Healthcare Support</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      padding: 20px;
+      line-height: 1.6;
+      background-color: #f8f9fa;
+    }
+    h1, h2 { color: #005eb8; } /* NHS blue */
+    .question { margin: 25px 0; }
+    button {
+      background-color: #005eb8;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover { background-color: #004080; }
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .emergency { background-color: #c8102e; color: white; }
+    .urgent    { background-color: #ff8c00; color: white; }
+    .routine   { background-color: #28a745; color: white; }
+    .info      { background-color: #17a2b8; color: white; }
+    footer {
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #555;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Symptom Severity Self-Assessment</h1>
+  <p>This tool helps you think about how serious your symptoms might be.<br>
+  <strong>It is NOT a diagnosis</strong> — always seek professional medical advice.</p>
+
+  <div class="question">
+    <h2>1. How severe is your main symptom right now?</h2>
+    <label><input type="radio" name="severity" value="severe"> Very severe — I cannot function normally</label><br>
+    <label><input type="radio" name="severity" value="moderate"> Moderate — it's affecting my daily life</label><br>
+    <label><input type="radio" name="severity" value="mild"> Mild — annoying but manageable</label>
+  </div>
+
+  <div class="question">
+    <h2>2. How quickly did the symptom start?</h2>
+    <label><input type="radio" name="onset" value="sudden"> Suddenly (within minutes or hours)</label><br>
+    <label><input type="radio" name="onset" value="gradual"> Gradually (over days or longer)</label>
+  </div>
+
+  <div class="question">
+    <h2>3. Do you have any of these additional warning signs?</h2>
+    <label><input type="checkbox" id="warning1"> Chest pain / pressure</label><br>
+    <label><input type="checkbox" id="warning2"> Difficulty breathing / shortness of breath</label><br>
+    <label><input type="checkbox" id="warning3"> Confusion, slurred speech, or weakness in face/arm/leg</label><br>
+    <label><input type="checkbox" id="warning4"> Severe headache that is unusual for you</label><br>
+    <label><input type="checkbox" id="warning5"> None of the above</label>
+  </div>
+
+  <button onclick="assessSeverity()">Assess Urgency</button>
+
+  <div id="result"></div>
+
+  <footer>
+    This is a guidance tool only. Always call 999 for emergencies, 111 for urgent advice, or contact your GP for non-urgent concerns.<br>
+    Last updated: February 2026
+  </footer>
+
+  <script>
+    function assessSeverity() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.className = '';
+      resultDiv.innerHTML = '';
+
+      // Get answers
+      const severity = document.querySelector('input[name="severity"]:checked')?.value;
+      const onset = document.querySelector('input[name="onset"]:checked')?.value;
+      const warnings = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                            .map(cb => cb.id);
+
+      if (!severity || !onset) {
+        resultDiv.innerHTML = "<p style='color:red;'>Please answer questions 1 and 2.</p>";
+        return;
+      }
+
+      let level = 'routine';
+      let message = "Based on your answers, this appears to be manageable at home or with a routine GP appointment.";
+
+      // Simple logic (can be expanded later)
+      if (warnings.includes('warning1') || warnings.includes('warning2') || 
+          warnings.includes('warning3') || warnings.includes('warning4')) {
+        level = 'emergency';
+        message = "You have selected one or more serious warning signs. <strong>Call 999 immediately</strong> or go to A&E.";
+      }
+      else if (severity === 'severe' || onset === 'sudden') {
+        level = 'urgent';
+        message = "Your symptoms sound significant. <strong>Please call NHS 111</strong> for urgent advice or speak to a healthcare professional soon.";
+      }
+      else if (severity === 'moderate') {
+        level = 'urgent';
+        message = "Your symptoms are affecting you noticeably. Contact your GP or call NHS 111 for advice.";
+      }
+
+      resultDiv.classList.add(level);
+      resultDiv.innerHTML = `<h2>${level.toUpperCase()} LEVEL</h2><p>${message}</p>`;
+    }
+  </script>
+
+</body>
+</html>
