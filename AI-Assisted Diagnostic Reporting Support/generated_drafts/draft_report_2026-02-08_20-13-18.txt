@@ -1,0 +1,8 @@
+Generated at: 2026-02-08_20-13-18
+Input: test_image.dcm
+======================================================================
+
+Sample findings: lungs clear. Impression: normal.
+
+======================================================================
+DRAFT ONLY – Requires clinician review. Not diagnostic.
